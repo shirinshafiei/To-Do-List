@@ -14,13 +14,13 @@ public class Database {
         }
         e.id = ID;
         ID++;
-        entities.add(e);
+        entities.add(e.copy());
     }
 
     public static Entity get(int id) {
         for (Entity e : entities) {
             if (e.id == id) {
-                return e;
+                return e.copy();
             }
         }
         throw new EntityNotFoundException("Entity not found with id: " + id);
@@ -39,7 +39,7 @@ public class Database {
         Entity existingEntity = get(e.id);
 
         int index = entities.indexOf(existingEntity);
-        entities.set(index, e);
+        entities.set(index, e.copy());
     }
 
 }

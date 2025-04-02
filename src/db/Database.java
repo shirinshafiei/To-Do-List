@@ -5,6 +5,7 @@ import db.exception.InvalidEntityException;
 
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 
@@ -22,6 +23,13 @@ public class Database {
         Validator validator = validators.get(e.getEntityCode());
         if (validator == null) {
             throw new IllegalArgumentException("No Validator registered for this Entity code");
+        }
+
+        if (e instanceof Trackable) {
+            Trackable trackableEntity = (Trackable) e;
+            Date currentTimestamp = new Date();
+            trackableEntity.setCreationDate(currentTimestamp);
+            trackableEntity.setLastModificationDate(currentTimestamp);
         }
 
         validator.validate(e);
@@ -53,6 +61,12 @@ public class Database {
         Validator validator = validators.get(e.getEntityCode());
         if (validator == null) {
             throw new IllegalArgumentException("No Validator registered for this Entity code");
+        }
+
+        if (e instanceof Trackable) {
+            Trackable trackableEntity = (Trackable) e;
+            Date currentTimestamp = new Date();
+            trackableEntity.setLastModificationDate(currentTimestamp);
         }
 
         validator.validate(e);

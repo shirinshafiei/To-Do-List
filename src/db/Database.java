@@ -5,6 +5,7 @@ import db.exception.InvalidEntityException;
 
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 
@@ -20,11 +21,16 @@ public class Database {
         }
 
         Validator validator = validators.get(e.getEntityCode());
-        if (validator == null) {
-            throw new IllegalArgumentException("No Validator registered for this Entity code");
+        if (validator != null) {
+            validator.validate(e);
         }
 
-        validator.validate(e);
+        if (e instanceof Trackable) {
+            Trackable trackableEntity = (Trackable) e;
+            Date currentTimestamp = new Date();
+            trackableEntity.setCreationDate(currentTimestamp);
+            trackableEntity.setLastModificationDate(currentTimestamp);
+        }
 
         e.id = ID;
         ID++;
@@ -51,16 +57,27 @@ public class Database {
         }
 
         Validator validator = validators.get(e.getEntityCode());
-        if (validator == null) {
-            throw new IllegalArgumentException("No Validator registered for this Entity code");
+        if (validator != null) {
+            validator.validate(e);
         }
 
-        validator.validate(e);
+        if (e instanceof Trackable) {
+            Trackable trackableEntity = (Trackable) e;
+            Date currentTimestamp = new Date();
+            trackableEntity.setLastModificationDate(currentTimestamp);
+        }
 
-        Entity existingEntity = get(e.id);
+        int index = -1;
+        for (int i = 0; i < entities.size(); i++) {
+            if (entities.get(i).id == e.id) {
+                index = i;
+                break;
+            }
+        }
 
-        int index = entities.indexOf(existingEntity);
-        entities.set(index, e.copy());
+        if (index == -1) {
+            throw new EntityNotFoundException("Entity not found with id: " + e.id);
+        }
     }
 
     public static void registerValidator(int entityCode, Validator validator) {

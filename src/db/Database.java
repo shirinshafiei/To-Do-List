@@ -21,8 +21,8 @@ public class Database {
         }
 
         Validator validator = validators.get(e.getEntityCode());
-        if (validator == null) {
-            throw new IllegalArgumentException("No Validator registered for this Entity code");
+        if (validator != null) {
+            validator.validate(e);
         }
 
         if (e instanceof Trackable) {
@@ -31,8 +31,6 @@ public class Database {
             trackableEntity.setCreationDate(currentTimestamp);
             trackableEntity.setLastModificationDate(currentTimestamp);
         }
-
-        validator.validate(e);
 
         e.id = ID;
         ID++;
@@ -59,8 +57,8 @@ public class Database {
         }
 
         Validator validator = validators.get(e.getEntityCode());
-        if (validator == null) {
-            throw new IllegalArgumentException("No Validator registered for this Entity code");
+        if (validator != null) {
+            validator.validate(e);
         }
 
         if (e instanceof Trackable) {
@@ -69,12 +67,17 @@ public class Database {
             trackableEntity.setLastModificationDate(currentTimestamp);
         }
 
-        validator.validate(e);
+        int index = -1;
+        for (int i = 0; i < entities.size(); i++) {
+            if (entities.get(i).id == e.id) {
+                index = i;
+                break;
+            }
+        }
 
-        Entity existingEntity = get(e.id);
-
-        int index = entities.indexOf(existingEntity);
-        entities.set(index, e.copy());
+        if (index == -1) {
+            throw new EntityNotFoundException("Entity not found with id: " + e.id);
+        }
     }
 
     public static void registerValidator(int entityCode, Validator validator) {

@@ -45,22 +45,18 @@ public class Database {
         throw new EntityNotFoundException("Entity not found with id: " + id);
     }
 
-    public static boolean delete(int id) {
-        synchronized (entities) {
-            Iterator<Entity> iterator = entities.iterator();
-            while (iterator.hasNext()) {
-                Entity e = iterator.next();
-                if (e.id == id) {
-                    iterator.remove();
-                    return true;
-                }
+    public static void delete(int id) {
+        for (Entity e : entities){
+            if (e.id == id){
+                entities.remove(e);
+                return;
             }
         }
-        return false;
+        throw new EntityNotFoundException("Entity not found with id: " + id);
     }
 
 
-    public static synchronized void update(Entity e) throws InvalidEntityException {
+    public static void update(Entity e) throws InvalidEntityException {
         if (e == null) {
             throw new IllegalArgumentException("Entity cannot be null");
         }

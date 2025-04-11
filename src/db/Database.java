@@ -2,12 +2,11 @@ package db;
 
 import db.exception.EntityNotFoundException;
 import db.exception.InvalidEntityException;
-
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-
+import java.util.Iterator;
 
 
 public class Database {
@@ -46,10 +45,20 @@ public class Database {
         throw new EntityNotFoundException("Entity not found with id: " + id);
     }
 
-    public static void delete(int id) {
-        Entity entity = get(id);
-        entities.remove(entity);
+    public static boolean delete(int id) {
+        synchronized (entities) {
+            Iterator<Entity> iterator = entities.iterator();
+            while (iterator.hasNext()) {
+                Entity e = iterator.next();
+                if (e.id == id) {
+                    iterator.remove();
+                    return true;
+                }
+            }
+        }
+        return false;
     }
+
 
     public static synchronized void update(Entity e) throws InvalidEntityException {
         if (e == null) {
@@ -67,15 +76,17 @@ public class Database {
             trackableEntity.setLastModificationDate(currentTimestamp);
         }
 
-        int index = -1;
+        boolean found = false;
         for (int i = 0; i < entities.size(); i++) {
-            if (entities.get(i).id == e.id) {
-                index = i;
+            Entity original = entities.get(i);
+            if (original.id == e.id) {
+                entities.set(i, e.copy());
+                found = true;
                 break;
             }
         }
 
-        if (index == -1) {
+        if (!found) {
             throw new EntityNotFoundException("Entity not found with id: " + e.id);
         }
     }
@@ -86,6 +97,18 @@ public class Database {
         }
 
         validators.put(entityCode, validator);
+    }
+
+    public static ArrayList<Entity> getAll(int entityCode) {
+        ArrayList<Entity> filteredEntities = new ArrayList<>();
+
+        for (Entity entity : entities) {
+            if (entity.getEntityCode() == entityCode) {
+                filteredEntities.add(entity.copy());
+            }
+        }
+
+        return filteredEntities;
     }
 
 }

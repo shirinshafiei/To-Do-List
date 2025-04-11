@@ -14,7 +14,7 @@ public class StepService {
     public static int addStep(int taskRef, String title) throws InvalidEntityException {
         Step step = new Step(title, Step.stepStatus.Notstarted, taskRef);
         Database.add(step);
-        return Database.ID - 1;
+        return step.id;
     }
 
     public static void deleteStep(int stepId) throws InvalidEntityException {
@@ -24,10 +24,7 @@ public class StepService {
     public static void deleteAllStepsForTask(int taskId) {
         List<Step> stepsToDelete = getStepsForTask(taskId);
         for (Step step : stepsToDelete) {
-            boolean isDeleted = Database.delete(step.id);
-            if (!isDeleted) {
-                System.out.println("Failed to delete step with ID: " + step.id);
-            }
+            Database.delete(step.id);
         }
     }
 

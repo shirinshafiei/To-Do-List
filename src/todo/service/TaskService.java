@@ -16,7 +16,7 @@ public class TaskService {
     public static int addTask(String title, String description, Date dueDate) throws InvalidEntityException {
         Task task = new Task(title, description, dueDate, Status.NotStarted);
         Database.add(task);
-        return Database.ID - 1;
+        return task.id;
     }
 
     public static void deleteTask(int id) {

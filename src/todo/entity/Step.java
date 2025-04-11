@@ -5,16 +5,16 @@ import db.Entity;
 public class Step extends Entity {
     public static final int STEP_ENTITY_CODE = 2;
 
-    public enum Status {
-        NotStarted,
+    public enum stepStatus {
+        Notstarted,
         Completed
     }
 
     private String title;
-    private Status status;
+    private stepStatus status;
     private int taskRef;
 
-    public Step(String title, Status status, int taskRef) {
+    public Step(String title, stepStatus status, int taskRef) {
         this.title = title;
         this.status = status;
         this.taskRef = taskRef;
@@ -28,11 +28,11 @@ public class Step extends Entity {
         this.title = title;
     }
 
-    public Status getStatus() {
+    public stepStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(stepStatus status) {
         this.status = status;
     }
 
